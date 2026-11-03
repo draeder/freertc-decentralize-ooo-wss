@@ -1,0 +1,28 @@
+node_modules/
+.wrangler/
+target/
+.dev.vars
+.env
+.env.local
+.env*.local
+*.log
+*.pid
+.DS_Store
+dist/
+build/
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+wrangler.toml
+wrangler.*.local.jsonc
+
+# Production deployment
+.env.local.prod
+config.local-prod.json
+certs/
+data/
+
+# Docker
+.dockerignore

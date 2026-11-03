@@ -1,0 +1,34 @@
+{
+  "name": "freertc-decentralize-ooo-wss",
+  "main": "src/index.js",
+  "compatibility_date": "2024-09-23",
+  // Keep variables set in the dashboard: a deploy must never remove them.
+  "keep_vars": true,
+  "workers_dev": true,
+  "assets": {
+    "directory": "public"
+  },
+  "vars": {
+    // Seeds: any relay can be one, and a seed answers a join with the relays closest to the
+    // joiner. List several; the relay asks one at a time, in random order.
+    "KADEMLIA_BOOTSTRAP_URLS": "wss://peer.ooo/ws,wss://decentralize.ooo/ws"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      // Omitting both resource selectors prevents Cloudflare's Deploy Button
+      // from matching an existing database and forces new D1 provisioning.
+      "migrations_dir": "migrations","database_id": "89b647c7-d434-43ff-a437-a2ab7ea7d489","database_name": "freertc-decentralize-ooo-wss"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "RELAY_COORDINATOR", "class_name": "RelayCoordinator" },
+      { "name": "RELAY_TUNNEL", "class_name": "RelayTunnel" }
+    ]
+  },
+  "migrations": [
+    { "tag": "relay-coordinator-v1", "new_sqlite_classes": ["RelayCoordinator"] },
+    { "tag": "relay-tunnel-v1", "new_sqlite_classes": ["RelayTunnel"] }
+  ]
+}

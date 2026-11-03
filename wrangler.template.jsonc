@@ -1,0 +1,96 @@
+// wrangler.template.jsonc — Copy to wrangler.jsonc and fill in your own values.
+{
+  "name": "freertc",
+  // Default JS worker runtime (no Rust toolchain required).
+  "main": "src/index.js",
+  "compatibility_date": "2024-09-23",
+  // Keep variables set in the dashboard: a deploy must never remove them.
+  "keep_vars": true,
+
+  // Serve static files from the public directory.
+  "assets": {
+    "directory": "public"
+  },
+
+  "vars": {
+
+    // Set automatically by the wizard from your domain (wss://<domain>/ws).
+    "RELAY_URL": "wss://YOUR_DOMAIN/ws",
+
+    // Set automatically by the wizard if you opt into the global network.
+    // Seeds for the Kademlia join: any relay can be one, and a seed answers with the relays
+    // closest to you. List several; the relay asks one at a time, in random order.
+    // Remove it to run standalone.
+    "KADEMLIA_BOOTSTRAP_URLS": "wss://peer.ooo/ws,wss://decentralize.ooo/ws",
+
+    // Deploy and local-dev scripts generate a stable private relay identity
+    // automatically. It is never stored in this configuration file.
+    // "RELAY_CAPACITY": "10000",
+    "RELAY_NAME": "Your App Relay"
+  },
+
+  // Cloudflare D1 SQLite database (free tier available).
+  // The wizard sets database_name to freertc-signal-<your-domain> automatically.
+  // To create manually: wrangler d1 create freertc-signal-your-domain
+  // Then paste the returned database_id below.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "freertc-signal-YOUR_DOMAIN",
+      "database_id": "YOUR_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  "durable_objects": {
+    "bindings": [
+      { "name": "RELAY_COORDINATOR", "class_name": "RelayCoordinator" },
+      { "name": "RELAY_TUNNEL", "class_name": "RelayTunnel" }
+    ]
+  },
+  "migrations": [
+    { "tag": "relay-coordinator-v1", "new_sqlite_classes": ["RelayCoordinator"] },
+    { "tag": "relay-tunnel-v1", "new_sqlite_classes": ["RelayTunnel"] }
+  ],
+
+  // ── Custom domain (OPTIONAL) ──────────────────────────────────────────────
+  // If you have a domain on Cloudflare, uncomment and fill in:
+  //
+  // "routes": [
+  //   {
+  //     "pattern": "your-domain.example/*",
+  //     "zone_name": "your-domain.example"
+  //   }
+  // ]
+  //
+  // Without routes, Cloudflare assigns a free subdomain:
+  //   https://freertc.<your-account>.workers.dev
+  // That URL works for WebSocket signaling too (wss://...).
+
+  // Optional: environment-specific overrides
+  "env": {
+    "production": {
+      "name": "freertc",
+      "vars": {
+        "RELAY_URL": "wss://YOUR_DOMAIN/ws",
+        "KADEMLIA_BOOTSTRAP_URLS": "wss://peer.ooo/ws,wss://decentralize.ooo/ws",
+        // The deploy script installs the production relay identity secret.
+        "RELAY_NAME": "Your App Relay"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "freertc-signal-YOUR_DOMAIN",
+          "database_id": "YOUR_D1_DATABASE_ID",
+          "migrations_dir": "migrations"
+        }
+      ],
+      "durable_objects": {
+        "bindings": [
+          { "name": "RELAY_COORDINATOR", "class_name": "RelayCoordinator" },
+          { "name": "RELAY_TUNNEL", "class_name": "RelayTunnel" }
+        ]
+      }
+    }
+  }
+}

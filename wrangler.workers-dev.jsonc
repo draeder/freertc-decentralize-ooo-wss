@@ -1,0 +1,36 @@
+{
+  "name": "freertc-worker-dev",
+  "main": "src/index.js",
+  "compatibility_date": "2024-09-23",
+  // Keep variables set in the dashboard: a deploy must never remove them.
+  "keep_vars": true,
+  "workers_dev": true,
+  "assets": {
+    "directory": "public"
+  },
+  "vars": {
+    // npm run dev:cf creates the private relay identity in .dev.vars.
+    // Seeds: any relay can be one. List several; the relay asks one at a time, in random order.
+    "KADEMLIA_BOOTSTRAP_URLS": "wss://peer.ooo/ws,wss://decentralize.ooo/ws"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "freertc-signal",
+      // Local development uses isolated D1 state. Replace this placeholder
+      // before using this config with a remote D1 database.
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "RELAY_COORDINATOR", "class_name": "RelayCoordinator" },
+      { "name": "RELAY_TUNNEL", "class_name": "RelayTunnel" }
+    ]
+  },
+  "migrations": [
+    { "tag": "relay-coordinator-v1", "new_sqlite_classes": ["RelayCoordinator"] },
+    { "tag": "relay-tunnel-v1", "new_sqlite_classes": ["RelayTunnel"] }
+  ]
+}
